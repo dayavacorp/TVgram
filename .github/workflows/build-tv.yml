@@ -51,7 +51,9 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | base64 -d > TMessagesProj/config/release.keystore
+            echo "$KEYSTORE_BASE64" | tr -d ' \r\n' | base64 -d > TMessagesProj/config/release.keystore
+            echo "keystore sha256: $(sha256sum TMessagesProj/config/release.keystore | cut -c1-16)"
+            keytool -list -keystore TMessagesProj/config/release.keystore -storepass "$KEYSTORE_PASSWORD" -alias "$KEY_ALIAS" > /dev/null || { echo "::error::Keystore secret is broken"; exit 1; }
             sed -i "s/^RELEASE_KEY_PASSWORD=.*/RELEASE_KEY_PASSWORD=$KEYSTORE_PASSWORD/; s/^RELEASE_STORE_PASSWORD=.*/RELEASE_STORE_PASSWORD=$KEYSTORE_PASSWORD/; s/^RELEASE_KEY_ALIAS=.*/RELEASE_KEY_ALIAS=$KEY_ALIAS/" gradle.properties
             echo "Signing with your own key"
           else
