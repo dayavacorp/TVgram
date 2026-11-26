@@ -148,6 +148,11 @@ android {
         minSdkVersion 23
         targetSdkVersion 36
 
+        // TVgram: native code only for ARM (TVs / boxes); halves the build time
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
+
         // TVgram: Telegram API keys (https://my.telegram.org). Env vars win (CI secrets), then gradle.properties.
         def tgApiId = System.getenv("TG_API_ID") ?: (project.findProperty("TG_API_ID") ?: "0")
         def tgApiHash = System.getenv("TG_API_HASH") ?: (project.findProperty("TG_API_HASH") ?: "")
