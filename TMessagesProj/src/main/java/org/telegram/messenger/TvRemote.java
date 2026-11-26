@@ -84,10 +84,70 @@ public class TvRemote {
         return isTv();
     }
 
+    // ---------------------------------------------------------------- TV storage defaults
+
+    /**
+     * TV boxes have little free storage. On first start: cache limit 300 MB,
+     * keep media 1 week for private chats and 1 day for groups / channels / stories.
+     * Applied once; the user can change everything in Settings > Data and Storage.
+     */
+    public static void applyTvGlobalDefaults() {
+        try {
+            if (!isTv()) return;
+            android.content.SharedPreferences p = SharedConfig.getPreferences();
+            if (p.getBoolean("tvgram_storage_defaults_v1", false)) return;
+            p.edit()
+                    .putInt("cache_limit", 1) // 1 = 300 MB in AutoDeleteMediaTask / CacheControlActivity
+                    .putInt("keep_media_type_" + CacheByChatsController.KEEP_MEDIA_TYPE_USER, CacheByChatsController.KEEP_MEDIA_ONE_WEEK)
+                    .putInt("keep_media_type_" + CacheByChatsController.KEEP_MEDIA_TYPE_GROUP, CacheByChatsController.KEEP_MEDIA_ONE_DAY)
+                    .putInt("keep_media_type_" + CacheByChatsController.KEEP_MEDIA_TYPE_CHANNEL, CacheByChatsController.KEEP_MEDIA_ONE_DAY)
+                    .putInt("keep_media_type_" + CacheByChatsController.KEEP_MEDIA_TYPE_STORIES, CacheByChatsController.KEEP_MEDIA_ONE_DAY)
+                    .putBoolean("tvgram_storage_defaults_v1", true)
+                    .apply();
+        } catch (Throwable e) {
+            FileLog.e(e);
+        }
+    }
+
+    /** Per logged-in account: no auto-download / preloading of videos and files (they open on demand). */
+    private static void applyTvAccountDefaults() {
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            try {
+                if (!UserConfig.getInstance(a).isClientActivated()) continue;
+                android.content.SharedPreferences s = MessagesController.getMainSettings(a);
+                if (s.getBoolean("tvgram_autodownload_v1", false)) continue;
+                DownloadController dc = DownloadController.getInstance(a);
+                DownloadController.Preset[] presets = {dc.mobilePreset, dc.wifiPreset, dc.roamingPreset};
+                String[] keys = {"mobilePreset", "wifiPreset", "roamingPreset"};
+                android.content.SharedPreferences.Editor e = s.edit();
+                for (int i = 0; i < presets.length; i++) {
+                    DownloadController.Preset pr = presets[i];
+                    for (int j = 0; j < pr.mask.length; j++) {
+                        pr.mask[j] &= ~(DownloadController.AUTODOWNLOAD_TYPE_VIDEO | DownloadController.AUTODOWNLOAD_TYPE_DOCUMENT);
+                    }
+                    pr.preloadVideo = false;
+                    pr.preloadMusic = false;
+                    pr.preloadStories = false;
+                    e.putString(keys[i], pr.toString());
+                }
+                // 3 = custom preset, so presets from the server do not overwrite ours
+                e.putInt("currentMobilePreset", dc.currentMobilePreset = 3);
+                e.putInt("currentWifiPreset", dc.currentWifiPreset = 3);
+                e.putInt("currentRoamingPreset", dc.currentRoamingPreset = 3);
+                e.putBoolean("tvgram_autodownload_v1", true);
+                e.apply();
+                dc.checkAutodownloadSettings();
+            } catch (Throwable e) {
+                FileLog.e(e);
+            }
+        }
+    }
+
     // ---------------------------------------------------------------- lifecycle
 
     public static void attach(Activity activity) {
         if (!isEnabled()) return;
+        applyTvAccountDefaults();
         activityRef = new WeakReference<>(activity);
         if (!polling) {
             polling = true;

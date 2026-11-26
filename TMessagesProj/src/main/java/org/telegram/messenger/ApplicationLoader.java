@@ -301,6 +301,9 @@ public class ApplicationLoader extends Application {
             return;
         }
 
+        // TVgram: small cache / short media retention on TVs (applied once, user can change later)
+        TvRemote.applyTvGlobalDefaults();
+
         // AndroidUtilities must be initialized before FileLog
         final String helloWorld = AndroidUtilities.getHelloWorld();
 

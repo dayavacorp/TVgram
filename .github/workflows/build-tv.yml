@@ -71,8 +71,9 @@ jobs:
       - name: Collect APK
         run: |
           VER=$(grep '^APP_VERSION_NAME=' gradle.properties | cut -d= -f2)
+          TVB=$(grep '^TV_BUILD=' gradle.properties | cut -d= -f2)
           mkdir -p out
-          cp TMessagesProj_App/build/outputs/apk/afat/release/app.apk "out/TVgram-${VER}-tv.apk"
+          cp TMessagesProj_App/build/outputs/apk/afat/release/app.apk "out/TVgram-${VER}-tv${TVB}.apk"
           ls -la out
 
       - uses: actions/upload-artifact@v4

@@ -169,7 +169,7 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 36
-        versionName APP_VERSION_NAME + "-tv"
+        versionName APP_VERSION_NAME + "-tv" + TV_BUILD
         ndkVersion "27.2.12479018"
 
         multiDexEnabled true
