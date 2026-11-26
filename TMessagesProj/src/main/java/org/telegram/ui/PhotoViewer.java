@@ -23887,6 +23887,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (!muteVideo && sendPhotoType != SELECT_TYPE_AVATAR && isCurrentVideo && videoPlayer != null && event.getRepeatCount() == 0 && event.getAction() == KeyEvent.ACTION_DOWN && (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP || event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN)) {
                 videoPlayer.setVolume(1.0f);
             }
+            if (org.telegram.messenger.TvRemote.dispatchKeyEvent(event)) return true;
             return super.dispatchKeyEvent(event);
         }
 

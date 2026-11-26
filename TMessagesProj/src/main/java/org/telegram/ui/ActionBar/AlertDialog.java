@@ -53,6 +53,7 @@ import android.widget.TextView;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
+import android.view.KeyEvent;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
 
@@ -376,6 +377,12 @@ public class AlertDialog extends Dialog implements Drawable.Callback, Notificati
     }
 
     private long shownAt;
+
+    @Override
+    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+        if (org.telegram.messenger.TvRemote.dispatchKeyEvent(event)) return true;
+        return super.dispatchKeyEvent(event);
+    }
 
     @Override
     public void show() {

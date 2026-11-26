@@ -148,6 +148,12 @@ android {
         minSdkVersion 23
         targetSdkVersion 36
 
+        // TVgram: Telegram API keys (https://my.telegram.org). Env vars win (CI secrets), then gradle.properties.
+        def tgApiId = System.getenv("TG_API_ID") ?: (project.findProperty("TG_API_ID") ?: "0")
+        def tgApiHash = System.getenv("TG_API_HASH") ?: (project.findProperty("TG_API_HASH") ?: "")
+        buildConfigField "int", "TG_API_ID", tgApiId.toString().trim()
+        buildConfigField "String", "TG_API_HASH", "\"" + tgApiHash.toString().trim() + "\""
+
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 
         multiDexEnabled true

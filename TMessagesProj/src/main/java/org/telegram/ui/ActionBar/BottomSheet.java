@@ -2636,6 +2636,7 @@ public class BottomSheet extends Dialog implements BaseFragment.AttachedSheet {
 
     @Override
     public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
+        if (org.telegram.messenger.TvRemote.dispatchKeyEvent(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 

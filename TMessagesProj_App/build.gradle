@@ -131,7 +131,8 @@ android {
         }
         afat {
             ndk {
-                abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+                // TVgram: TV boxes and TVs are ARM (most run 32-bit userspace)
+                abiFilters "armeabi-v7a", "arm64-v8a"
             }
             sourceSets.debug {
                 manifest.srcFile '../TMessagesProj/config/debug/AndroidManifest_SDK23.xml'
@@ -168,7 +169,7 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 36
-        versionName APP_VERSION_NAME
+        versionName APP_VERSION_NAME + "-tv"
         ndkVersion "27.2.12479018"
 
         multiDexEnabled true

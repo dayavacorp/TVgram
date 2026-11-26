@@ -3064,7 +3064,14 @@ public class AndroidUtilities {
     }
 
     public static boolean isTabletForce() {
-        return ApplicationLoader.applicationContext != null && ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isTablet);
+        if (ApplicationLoader.applicationContext == null) return false;
+        if (ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isTablet)) return true;
+        // TVgram: two-pane (tablet) layout — chat list on the left, chat on the right — on big TV screens
+        if (TvRemote.isTv()) {
+            android.content.res.Configuration c = ApplicationLoader.applicationContext.getResources().getConfiguration();
+            return c.screenWidthDp >= 840 && c.screenHeightDp >= 460;
+        }
+        return false;
     }
 
     public static boolean isTabletInternal() {
